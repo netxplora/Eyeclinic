@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 220 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+
+    --primary: 164 71% 34%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 164 71% 94%;
+
+    --secondary: 164 40% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 164 20% 94%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 40 90% 55%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 40 90% 96%;
+
+    --success: 145 65% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 164 71% 34%;
+
+    --radius: 0.5rem;
+    /* Less playful, more professional squared corners */
+
+    /* Professional, solid simple tones without heavy "sci-fi" aesthetics */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(164 71% 34%) 0%,
+      hsl(164 80% 28%) 100%
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      hsl(40 90% 55%) 0%,
+      hsl(25 95% 50%) 100%
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(164 71% 34%) 0%,
+      hsl(164 80% 28%) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(0 0% 100%) 0%,
+      hsl(164 20% 98%) 100%
+    );
+    --gradient-overlay: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(220 25% 10% / 0.5) 100%
+    );
+
+    --shadow-sm: 0 2px 4px hsl(164 71% 34% / 0.05);
+    --shadow-md: 0 4px 12px hsl(164 71% 34% / 0.1);
+    --shadow-lg: 0 8px 24px hsl(164 71% 34% / 0.12);
+    --shadow-xl: 0 16px 48px hsl(164 71% 34% / 0.15);
+    --shadow-2xl: 0 24px 64px hsl(164 71% 34% / 0.2);
+
+    --transition-smooth: all 0.3s ease-in-out;
+    --transition-bounce: all 0.4s ease-out;
+  }
+
+  .dark {
+    --background: 220 30% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 28% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 28% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 214 100% 65%;
+    --primary-foreground: 220 30% 6%;
+    --primary-light: 214 100% 20%;
+
+    --secondary: 260 60% 70%;
+    --secondary-foreground: 220 30% 6%;
+    --secondary-light: 260 60% 20%;
+
+    --muted: 220 25% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 340 90% 70%;
+    --accent-foreground: 220 30% 6%;
+    --accent-light: 340 90% 20%;
+
+    --success: 145 65% 55%;
+    --success-foreground: 220 30% 6%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 25% 20%;
+    --input: 220 25% 20%;
+    --ring: 214 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.4);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.7);
+  }
+}
+
+@layer utilities {
+  /* Entrance animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  /* Glass card */
+  .glass {
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+}
