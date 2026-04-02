@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Search, Users, ChevronDown, ChevronUp, Clock, Save, Edit, Calendar, UserPlus } from 'lucide-react';
+import { ArrowLeft, Search, Users, ChevronDown, ChevronUp, Clock, Save, Edit, Calendar, UserPlus, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';

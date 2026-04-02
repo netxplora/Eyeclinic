@@ -445,7 +445,7 @@ const PatientDashboard = () => {
                                 a.download = doc.file_name;
                                 a.click();
                                 URL.revokeObjectURL(url);
-                              } catch(err) {
+                              } catch (err) {
                                 toast.error("Failed to download file");
                               }
                             };
@@ -453,21 +453,21 @@ const PatientDashboard = () => {
                               <div key={doc.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-2 border-slate-100 rounded-xl hover:border-indigo-200 transition-colors bg-white">
                                 <div className="flex items-start gap-3">
                                   <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                                     <FileText className="w-5 h-5 text-indigo-500" />
+                                    <FileText className="w-5 h-5 text-indigo-500" />
                                   </div>
                                   <div className="min-w-0">
-                                     <p className="font-bold text-sm text-slate-800 truncate">{doc.record_title}</p>
-                                     <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                                        <Badge variant="outline" className="text-[10px] py-0">{doc.record_type}</Badge>
-                                        <span>{(doc.file_size / 1024 / 1024).toFixed(2)} MB</span>
-                                        <span>·</span>
-                                        <span>{new Date(doc.created_at).toLocaleDateString()}</span>
-                                     </div>
+                                    <p className="font-bold text-sm text-slate-800 truncate">{doc.record_title}</p>
+                                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                                      <Badge variant="outline" className="text-[10px] py-0">{doc.record_type}</Badge>
+                                      <span>{(doc.file_size / 1024 / 1024).toFixed(2)} MB</span>
+                                      <span>·</span>
+                                      <span>{new Date(doc.created_at).toLocaleDateString()}</span>
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="mt-3 sm:mt-0 flex justify-end">
                                   <Button variant="outline" size="sm" onClick={handleDownload} className="h-8 gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50">
-                                      <Download className="w-3.5 h-3.5" /> View
+                                    <Download className="w-3.5 h-3.5" /> View
                                   </Button>
                                 </div>
                               </div>
@@ -490,258 +490,303 @@ const PatientDashboard = () => {
                         {billingRecords.map((bill) => {
                           const appt = appointments.find(a => a.id === bill.appointment_id);
                           return (
-                                  <div key={bill.id} className="p-4 border rounded-xl flex flex-col sm:flex-row justify-between items-center bg-white shadow-sm gap-4">
-                                    <div className="flex gap-4 items-center">
-                                      <div className="bg-slate-100 p-3 rounded-lg"><FileText className="w-6 h-6 text-slate-600" /></div>
-                                      <div>
-                                        <p className="font-bold text-base">Invoice {bill.invoice_number}</p>
-                                        <p className="text-xs text-muted-foreground">{appt?.clinic_services?.service_name || 'Consultation'} · {appt?.appointment_date}</p>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
-                                      <div className="text-right">
-                                        <p className="text-lg font-black text-primary">₦ {Number(bill.amount).toLocaleString()}</p>
-                                        <Badge className={bill.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
-                                          {bill.status.toUpperCase()}
-                                        </Badge>
-                                      </div>
-                                      <div className="flex gap-2">
-                                        <Button variant="outline" size="icon" onClick={() => window.print()} title="Print Invoice">
-                                          <Printer className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="outline" size="sm">View Receipt</Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  );
-                        })}
+                            <div key={bill.id} className="p-4 border rounded-xl flex flex-col sm:flex-row justify-between items-center bg-white shadow-sm gap-4">
+                              <div className="flex gap-4 items-center">
+                                <div className="bg-slate-100 p-3 rounded-lg"><FileText className="w-6 h-6 text-slate-600" /></div>
+                                <div>
+                                  <p className="font-bold text-base">Invoice {bill.invoice_number}</p>
+                                  <p className="text-xs text-muted-foreground">{appt?.clinic_services?.service_name || 'Consultation'} · {appt?.appointment_date}</p>
                                 </div>
+                              </div>
+                              <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                                <div className="text-right">
+                                  <p className="text-lg font-black text-primary">₦ {Number(bill.amount).toLocaleString()}</p>
+                                  <Badge className={bill.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
+                                    {bill.status.toUpperCase()}
+                                  </Badge>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button variant="outline" size="icon" onClick={() => window.print()} title="Print Invoice">
+                                    <Printer className="w-4 h-4" />
+                                  </Button>
+                                  <Button variant="outline" size="sm">View Receipt</Button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
-                              </TabsContent>
+                  </TabsContent>
 
-                              <TabsContent value="followups">
-                                {followUpAppts.length === 0 ? (
-                                  <div className="text-center py-12 bg-muted/20 rounded-lg">
-                                    <CalendarPlus className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium">No follow-up appointments</h3>
-                                    <p className="text-sm text-muted-foreground mt-2">Any follow-up visits scheduled by your doctor will appear here.</p>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-4">{followUpAppts.map(a => renderAppointmentCard(a))}</div>
-                                )}
-                              </TabsContent>
+                  <TabsContent value="followups">
+                    {followUpAppts.length === 0 ? (
+                      <div className="text-center py-12 bg-muted/20 rounded-lg">
+                        <CalendarPlus className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">No follow-up appointments</h3>
+                        <p className="text-sm text-muted-foreground mt-2">Any follow-up visits scheduled by your doctor will appear here.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">{followUpAppts.map(a => renderAppointmentCard(a))}</div>
+                    )}
+                  </TabsContent>
 
-                              <TabsContent value="cancelled">
-                                {cancelledAppts.length === 0 ? (
-                                  <div className="text-center py-12 bg-muted/20 rounded-lg">
-                                    <XCircle className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                                    <h3 className="text-lg font-medium">No cancelled appointments</h3>
-                                    <p className="text-sm text-muted-foreground mt-2">Great! You haven't cancelled any visits.</p>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-4">{cancelledAppts.map(a => renderAppointmentCard(a, false))}</div>
-                                )}
-                              </TabsContent>
-                            </Tabs>
+                  <TabsContent value="cancelled">
+                    {cancelledAppts.length === 0 ? (
+                      <div className="text-center py-12 bg-muted/20 rounded-lg">
+                        <XCircle className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">No cancelled appointments</h3>
+                        <p className="text-sm text-muted-foreground mt-2">Great! You haven't cancelled any visits.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">{cancelledAppts.map(a => renderAppointmentCard(a, false))}</div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 
-                  {/* Medical Records Summary */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-xl">
-                        <FileText className="w-5 h-5 text-teal-600" />
-                        Consultation History
-                      </CardTitle>
-                      <CardDescription>A summary of your consultations and services received.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {pastAppts.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          No consultation records yet. Complete your first visit to see your medical history here.
+            {/* Medical Records Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <FileText className="w-5 h-5 text-teal-600" />
+                  Consultation History
+                </CardTitle>
+                <CardDescription>A summary of your consultations and services received.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {pastAppts.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    No consultation records yet. Complete your first visit to see your medical history here.
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                    {pastAppts.map((visit) => (
+                      <div key={visit.id} className="flex items-start gap-3 p-3 bg-muted/20 rounded-lg border border-border hover:border-teal-200 transition-colors">
+                        <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${visit.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'
+                          }`}></div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium text-sm">{visit.clinic_services?.service_name || 'Consultation'}</p>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(visit.appointment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {visit.doctors?.name || 'Specialist'} · {visit.appointment_start?.substring(0, 5)}
+                          </p>
+                          {visit.additional_notes && (
+                            <p className="text-xs text-slate-500 mt-1 border-l-2 border-teal-300 pl-2 italic">
+                              {visit.additional_notes.length > 100 ? visit.additional_notes.substring(0, 100) + '...' : visit.additional_notes}
+                            </p>
+                          )}
                         </div>
-                      ) : (
-                        <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                          {pastAppts.map((visit) => (
-                            <div key={visit.id} className="flex items-start gap-3 p-3 bg-muted/20 rounded-lg border border-border hover:border-teal-200 transition-colors">
-                              <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${visit.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'
-                                }`}></div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between">
-                                  <p className="font-medium text-sm">{visit.clinic_services?.service_name || 'Consultation'}</p>
-                                  <span className="text-xs text-muted-foreground">
-                                    {new Date(visit.appointment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-muted-foreground">
-                                  {visit.doctors?.name || 'Specialist'} · {visit.appointment_start?.substring(0, 5)}
-                                </p>
-                                {visit.additional_notes && (
-                                  <p className="text-xs text-slate-500 mt-1 border-l-2 border-teal-300 pl-2 italic">
-                                    {visit.additional_notes.length > 100 ? visit.additional_notes.substring(0, 100) + '...' : visit.additional_notes}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Documents & Test Results */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <FileText className="w-5 h-5 text-indigo-600" />
+                  Documents & Test Results
+                </CardTitle>
+                <CardDescription>View and download your official medical documents.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {medicalRecords.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    No uploaded documents yet. Records like prescriptions and test results will appear here.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
+                    {medicalRecords.map((doc) => (
+                      <div key={doc.id} className="flex flex-col gap-2 p-3 bg-muted/10 border border-slate-200 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <FileText className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-sm truncate">{doc.record_title}</p>
+                            <p className="text-[10px] text-muted-foreground">{doc.record_type} • {new Date(doc.created_at).toLocaleDateString()}</p>
+                          </div>
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                        <div className="flex gap-2 mt-1">
+                          {doc.file_url ? (
+                            <Button variant="secondary" size="sm" className="w-full text-xs h-8 gap-1" asChild>
+                              <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                                <Download className="w-3 h-3" /> Download
+                              </a>
+                            </Button>
+                          ) : (
+                            <Button variant="secondary" size="sm" className="w-full text-xs h-8 gap-1" disabled>
+                              <AlertCircle className="w-3 h-3" /> Text Record
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+
+            {/* Profile Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  Profile Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm text-muted-foreground">Full Name</label>
+                  <p className="font-medium text-foreground">{user?.user_metadata?.full_name || 'N/A'}</p>
                 </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Email</label>
+                  <p className="font-medium text-foreground">{user?.email}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground">Phone Number</label>
+                  <p className="font-medium text-foreground">{user?.user_metadata?.phone || 'Not provided'}</p>
+                </div>
+                <div className="pt-4 border-t border-border">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setIsEditProfileOpen(true)}
+                  >
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-                {/* Sidebar */}
-                <div className="space-y-6">
-
-                  {/* Profile Card */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        <User className="w-5 h-5 text-primary" />
-                        Profile Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+            {/* Quick Notifications */}
+            <Card className="border-2 border-blue-200/50 bg-blue-50/20">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
+                  <Bell className="w-5 h-5" />
+                  Notifications
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {upcomingAppts.length > 0 ? (
+                  upcomingAppts.slice(0, 3).map(appt => (
+                    <div key={appt.id} className="flex items-start gap-2 p-2 bg-white rounded-md border border-blue-100 text-sm">
+                      <Calendar className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                       <div>
-                        <label className="text-sm text-muted-foreground">Full Name</label>
-                        <p className="font-medium text-foreground">{user?.user_metadata?.full_name || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-muted-foreground">Email</label>
-                        <p className="font-medium text-foreground">{user?.email}</p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-muted-foreground">Phone Number</label>
-                        <p className="font-medium text-foreground">{user?.user_metadata?.phone || 'Not provided'}</p>
-                      </div>
-                      <div className="pt-4 border-t border-border">
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => setIsEditProfileOpen(true)}
-                        >
-                          <Edit2 className="w-4 h-4 mr-2" />
-                          Edit Profile
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Quick Notifications */}
-                  <Card className="border-2 border-blue-200/50 bg-blue-50/20">
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center gap-2 text-blue-700">
-                        <Bell className="w-5 h-5" />
-                        Notifications
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {upcomingAppts.length > 0 ? (
-                        upcomingAppts.slice(0, 3).map(appt => (
-                          <div key={appt.id} className="flex items-start gap-2 p-2 bg-white rounded-md border border-blue-100 text-sm">
-                            <Calendar className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <p className="font-medium text-blue-900">
-                                {appt.status === 'pending' ? 'Pending Confirmation' : 'Confirmed Appointment'}
-                              </p>
-                              <p className="text-xs text-blue-600">
-                                {new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {appt.appointment_start?.substring(0, 5)}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-muted-foreground text-center py-3">No new notifications</p>
-                      )}
-
-                      {followUpAppts.filter(a => a.appointment_date >= today).length > 0 && (
-                        <div className="flex items-start gap-2 p-2 bg-teal-50 rounded-md border border-teal-200 text-sm">
-                          <CalendarPlus className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="font-medium text-teal-900">Follow-Up Reminder</p>
-                            <p className="text-xs text-teal-600">You have {followUpAppts.filter(a => a.appointment_date >= today).length} upcoming follow-up(s)</p>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {/* Help Card */}
-                  <Card className="bg-primary/5 border-primary/20">
-                    <CardContent className="p-4 flex gap-3 text-sm flex-col">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                        <p className="text-muted-foreground leading-snug">
-                          Need to modify an appointment? You can cancel directly above, or notify us at least 24 hours in advance by requesting a reschedule.
+                        <p className="font-medium text-blue-900">
+                          {appt.status === 'pending' ? 'Pending Confirmation' : 'Confirmed Appointment'}
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          {new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {appt.appointment_start?.substring(0, 5)}
                         </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-
-              {/* Edit Profile Dialog */}
-              <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Profile Information</DialogTitle>
-                    <DialogDescription>
-                      Update your contact details below. Changes will be reflected immediately.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name</Label>
-                      <Input
-                        id="fullName"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        placeholder="Enter your full name"
-                      />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        value={editPhone}
-                        onChange={(e) => setEditPhone(e.target.value)}
-                        placeholder="Enter your phone number"
-                      />
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-3">No new notifications</p>
+                )}
+
+                {followUpAppts.filter(a => a.appointment_date >= today).length > 0 && (
+                  <div className="flex items-start gap-2 p-2 bg-teal-50 rounded-md border border-teal-200 text-sm">
+                    <CalendarPlus className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-teal-900">Follow-Up Reminder</p>
+                      <p className="text-xs text-teal-600">You have {followUpAppts.filter(a => a.appointment_date >= today).length} upcoming follow-up(s)</p>
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsEditProfileOpen(false)} disabled={isSavingProfile}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleUpdateProfile} disabled={isSavingProfile}>
-                      {isSavingProfile ? 'Saving...' : 'Save Changes'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                )}
+              </CardContent>
+            </Card>
 
-              {/* Cancel Appointment Dialog */}
-              <Dialog open={isCancelApptOpen} onOpenChange={setIsCancelApptOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Cancel Appointment</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to cancel this appointment? This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter className="mt-4">
-                    <Button variant="outline" onClick={() => setIsCancelApptOpen(false)} disabled={isCancelling}>
-                      No, Keep It
-                    </Button>
-                    <Button variant="destructive" onClick={handleCancelAppointment} disabled={isCancelling}>
-                      {isCancelling ? 'Cancelling...' : 'Yes, Cancel Appointment'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            {/* Help Card */}
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="p-4 flex gap-3 text-sm flex-col">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-muted-foreground leading-snug">
+                    Need to modify an appointment? You can cancel directly above, or notify us at least 24 hours in advance by requesting a reschedule.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </Layout>
-        );
+        </div>
+
+        {/* Edit Profile Dialog */}
+        <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Profile Information</DialogTitle>
+              <DialogDescription>
+                Update your contact details below. Changes will be reflected immediately.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  placeholder="Enter your phone number"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsEditProfileOpen(false)} disabled={isSavingProfile}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateProfile} disabled={isSavingProfile}>
+                {isSavingProfile ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Cancel Appointment Dialog */}
+        <Dialog open={isCancelApptOpen} onOpenChange={setIsCancelApptOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Appointment</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={() => setIsCancelApptOpen(false)} disabled={isCancelling}>
+                No, Keep It
+              </Button>
+              <Button variant="destructive" onClick={handleCancelAppointment} disabled={isCancelling}>
+                {isCancelling ? 'Cancelling...' : 'Yes, Cancel Appointment'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </Layout>
+  );
 };
 
-        export default PatientDashboard;
+export default PatientDashboard;

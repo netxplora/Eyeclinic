@@ -39,6 +39,17 @@ const PatientProfile = () => {
   const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', address: '', medical_notes: '' });
   const [isSaving, setIsSaving] = useState(false);
 
+  // Upload Document
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [uploadForm, setUploadForm] = useState({ title: '', type: 'General', appointmentId: '', notes: '' });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Clinical Note
+  const [isNoteOpen, setIsNoteOpen] = useState(false);
+  const [noteForm, setNoteForm] = useState({ appointmentId: '', notes: '' });
+  const [isSavingNote, setIsSavingNote] = useState(false);
+
   useEffect(() => {
     if (id) {
       fetchPatientData();
@@ -131,6 +142,80 @@ const PatientProfile = () => {
       URL.revokeObjectURL(url);
     } catch(err) {
       toast.error("Failed to download file");
+    }
+  };
+
+  const handleUploadDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadFile) {
+      toast.error("Please select a file to upload");
+      return;
+    }
+    if (!uploadForm.appointmentId) {
+      toast.error("Please select an appointment context");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = uploadFile.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      const filePath = `${patient.id || id}/${fileName}`; // fallback to URL id if patient.id missing
+
+      const { error: uploadError } = await supabase.storage
+        .from('medical_documents')
+        .upload(filePath, uploadFile);
+
+      if (uploadError) throw uploadError;
+
+      const { error: insertError } = await supabase
+        .from('medical_records' as any)
+        .insert({
+          appointment_id: uploadForm.appointmentId,
+          record_title: uploadForm.title,
+          record_type: uploadForm.type,
+          file_name: uploadFile.name,
+          file_url: filePath,
+          file_size: uploadFile.size,
+          notes: uploadForm.notes
+        });
+
+      if (insertError) throw insertError;
+
+      toast.success("Document uploaded successfully");
+      setIsUploadOpen(false);
+      setUploadForm({ title: '', type: 'General', appointmentId: '', notes: '' });
+      setUploadFile(null);
+      fetchPatientData();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to upload document");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleUpdateNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!noteForm.appointmentId) {
+      toast.error("Please select an appointment context");
+      return;
+    }
+    setIsSavingNote(true);
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ additional_notes: noteForm.notes })
+        .eq('id', noteForm.appointmentId);
+        
+      if (error) throw error;
+      toast.success("Clinical note updated");
+      setIsNoteOpen(false);
+      fetchPatientData();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update note");
+    } finally {
+      setIsSavingNote(false);
     }
   };
 
@@ -285,23 +370,46 @@ const PatientProfile = () => {
               <TabsContent value="medical" className="space-y-6 animate-fade-in">
                 {/* Clinical Results Summary */}
                 <Card className="border-l-4 border-l-teal-500">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                       <Stethoscope className="w-5 h-5 text-teal-600" /> Clinical Examination Notes
-                    </CardTitle>
-                    <CardDescription>Direct findings from consultations</CardDescription>
+                  <CardHeader className="flex flex-row items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                         <Stethoscope className="w-5 h-5 text-teal-600" /> Clinical Examination Notes
+                      </CardTitle>
+                      <CardDescription>Direct findings from consultations</CardDescription>
+                    </div>
+                    {userRole === 'doctor' && appointments.length > 0 && (
+                      <Button size="sm" variant="outline" className="gap-2 text-teal-700 hover:text-teal-800 hover:bg-teal-50 border-teal-200" onClick={() => {
+                        setNoteForm({ appointmentId: appointments[0].id, notes: appointments[0].additional_notes || '' });
+                        setIsNoteOpen(true);
+                      }}>
+                        <PlusCircle className="w-4 h-4" /> Add Note
+                      </Button>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-4">
                      {appointments.filter(a => a.additional_notes).length === 0 ? (
                        <p className="text-sm text-muted-foreground italic py-4">No clinical examination notes available.</p>
                      ) : (
                        appointments.filter(a => a.additional_notes).map(a => (
-                         <div key={a.id} className="p-4 bg-teal-50/30 rounded-lg border border-teal-100">
-                            <div className="flex justify-between items-center mb-2">
+                         <div key={a.id} className="p-4 bg-teal-50/30 rounded-lg border border-teal-100 group relative">
+                            {userRole === 'doctor' && (
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-teal-600 hover:bg-teal-100"
+                                onClick={() => {
+                                  setNoteForm({ appointmentId: a.id, notes: a.additional_notes || '' });
+                                  setIsNoteOpen(true);
+                                }}
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <div className="flex justify-between items-center mb-2 pr-8">
                                <p className="text-xs font-bold text-teal-800">{a.appointment_date}</p>
                                <Badge variant="outline" className="text-[10px]">{a.clinic_services?.service_name}</Badge>
                             </div>
-                            <p className="text-sm text-slate-700">{a.additional_notes}</p>
+                            <p className="text-sm text-slate-700 whitespace-pre-wrap">{a.additional_notes}</p>
                          </div>
                        ))
                      )}
@@ -310,11 +418,21 @@ const PatientProfile = () => {
 
                 {/* Uploaded Documents */}
                 <Card className="border-l-4 border-l-indigo-500">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                       <FileText className="w-5 h-5 text-indigo-600" /> Uploaded Files & Scans
-                    </CardTitle>
-                    <CardDescription>Official medical documents and images</CardDescription>
+                  <CardHeader className="flex flex-row items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                         <FileText className="w-5 h-5 text-indigo-600" /> Uploaded Files & Scans
+                      </CardTitle>
+                      <CardDescription>Official medical documents and images</CardDescription>
+                    </div>
+                    {(userRole === 'admin' || userRole === 'doctor') && appointments.length > 0 && (
+                      <Button size="sm" variant="outline" className="gap-2" onClick={() => {
+                        setUploadForm({ ...uploadForm, appointmentId: appointments[0].id });
+                        setIsUploadOpen(true);
+                      }}>
+                        <PlusCircle className="w-4 h-4" /> Upload
+                      </Button>
+                    )}
                   </CardHeader>
                   <CardContent>
                     {medicalRecords.filter(r => r.file_url).length === 0 ? (
@@ -408,6 +526,127 @@ const PatientProfile = () => {
                   <Button type="button" variant="ghost" onClick={() => setIsEditOpen(false)}>Cancel</Button>
                   <Button type="submit" disabled={isSaving}>
                      {isSaving ? 'Saving...' : 'Save Changes'}
+                  </Button>
+               </DialogFooter>
+            </form>
+         </DialogContent>
+      </Dialog>
+
+      {/* Upload Document Dialog */}
+      <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+         <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Upload Medical Record</DialogTitle></DialogHeader>
+            <form onSubmit={handleUploadDocument} className="space-y-4 pt-4">
+               <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label>Visit / Appointment Context *</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={uploadForm.appointmentId} 
+                      onChange={e => setUploadForm({...uploadForm, appointmentId: e.target.value})} 
+                      required
+                    >
+                      <option value="">Select Appointment</option>
+                      {appointments.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.appointment_date} - {a.clinic_services?.service_name || 'Consultation'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Document Title *</Label>
+                    <Input 
+                      placeholder="e.g. Blood Test Results" 
+                      value={uploadForm.title} 
+                      onChange={e => setUploadForm({...uploadForm, title: e.target.value})} 
+                      required 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Document Type *</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      value={uploadForm.type} 
+                      onChange={e => setUploadForm({...uploadForm, type: e.target.value})} 
+                      required
+                    >
+                      <option value="General">General</option>
+                      <option value="Prescription">Prescription</option>
+                      <option value="Test Result">Test/Lab Result</option>
+                      <option value="Scan">Scan/Imaging</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Select File *</Label>
+                    <Input 
+                      type="file" 
+                      onChange={e => setUploadFile(e.target.files ? e.target.files[0] : null)} 
+                      required 
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Notes / Remarks</Label>
+                    <Textarea 
+                      placeholder="Any additional instructions or remarks..." 
+                      value={uploadForm.notes} 
+                      onChange={e => setUploadForm({...uploadForm, notes: e.target.value})} 
+                      rows={2}
+                    />
+                  </div>
+               </div>
+               <DialogFooter className="pt-4">
+                  <Button type="button" variant="ghost" onClick={() => setIsUploadOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={isUploading || !uploadFile}>
+                     {isUploading ? 'Uploading...' : 'Upload Document'}
+                  </Button>
+               </DialogFooter>
+            </form>
+         </DialogContent>
+      </Dialog>
+
+      {/* Clinical Note Dialog */}
+      <Dialog open={isNoteOpen} onOpenChange={setIsNoteOpen}>
+         <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Clinical Note</DialogTitle></DialogHeader>
+            <form onSubmit={handleUpdateNote} className="space-y-4 pt-4">
+               <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label>Visit / Appointment Context *</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      value={noteForm.appointmentId} 
+                      onChange={e => {
+                        const appdId = e.target.value;
+                        const defaultNotes = appointments.find(a => a.id === appdId)?.additional_notes || '';
+                        setNoteForm({ appointmentId: appdId, notes: defaultNotes });
+                      }} 
+                      required
+                    >
+                      <option value="">Select Appointment</option>
+                      {appointments.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.appointment_date} - {a.clinic_services?.service_name || 'Consultation'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Examination Notes / Findings *</Label>
+                    <Textarea 
+                      placeholder="Symptoms, diagnosis, prescriptions, general findings..." 
+                      value={noteForm.notes} 
+                      onChange={e => setNoteForm({...noteForm, notes: e.target.value})} 
+                      required
+                      rows={6}
+                    />
+                  </div>
+               </div>
+               <DialogFooter className="pt-4">
+                  <Button type="button" variant="ghost" onClick={() => setIsNoteOpen(false)}>Cancel</Button>
+                  <Button type="submit" disabled={isSavingNote}>
+                     {isSavingNote ? 'Saving...' : 'Save Note'}
                   </Button>
                </DialogFooter>
             </form>
